@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Welcome Page</title>
+  </head>
+  <body>
+    <h2>Welcome, <span id="username"></span></h2>
+    <form action="/logout" method="POST">
+      <button type="submit">Logout</button>
+    </form>
+  </body>
+  <script>
+    // Mendapatkan nama pengguna dari session atau dari server
+    fetch("/getUser")
+      .then((response) => response.json())
+      .then((data) => {
+        document.getElementById("username").textContent = data.name;
+      });
+  </script>
+</html>
