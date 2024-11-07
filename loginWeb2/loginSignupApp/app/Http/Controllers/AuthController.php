@@ -21,25 +21,35 @@ class AuthController extends Controller
     }
 
     public function register(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users',
+        'password' => 'required|confirmed|min:6',
+    ]);
+
+    // Create the user
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+    ]);
+
+    if ($user) {
+        // Return JSON response to trigger success in JavaScript
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Registration successful!',
+            'redirect_url' => route('login'),
         ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+    } else {
+        // Handle failure (optional)
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Registration failed. Please try again.',
         ]);
-
-        return redirect('/login')->with('success', 'Registration successful! Please log in.');
     }
+}
 
     public function login(Request $request)
     {
